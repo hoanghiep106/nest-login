@@ -13,15 +13,15 @@ describe('envConfig', () => {
   });
 
   it('parse string config value', () => {
-    process.env.JWT_SECRET_TOKEN = '123456';
+    process.env.JWT_SECRET = '123456';
     const config = new Config();
 
-    const expectedStringValue = process.env.JWT_SECRET_TOKEN;
+    const expectedStringValue = process.env.JWT_SECRET;
     expect(config.get('JWT_SECRET')).toEqual(expectedStringValue);
   });
 
   it('parse number config value', () => {
-    process.env.PORT = '3000';
+    process.env.PORT = '3001';
     const config = new Config();
 
     const expectedNumberValue = parseInt(process.env.PORT);
