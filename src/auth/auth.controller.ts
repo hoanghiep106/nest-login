@@ -1,4 +1,10 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ErrorMessage, UserStatus } from '../enums';
 import { UserService } from '../user/user.service';
 import { loginFailedRateLimiter } from '../utils/rateLimiter';
@@ -24,7 +30,7 @@ export class AuthController {
 
     // User is locked
     if (user.status === UserStatus.Locked) {
-      throw new UnauthorizedException({
+      throw new ForbiddenException({
         message: ErrorMessage.LOCKED_USER,
       });
     }
@@ -43,7 +49,7 @@ export class AuthController {
 
         loginFailedRateLimiter.reset(user.username);
 
-        throw new UnauthorizedException({
+        throw new ForbiddenException({
           message: ErrorMessage.LOCKED_USER,
         });
       }
@@ -53,7 +59,7 @@ export class AuthController {
       });
     }
     return {
-      accessToken: this.authService.generateAccessToken(loginDto.username),
+      accessToken: this.authService.generateToken(loginDto.username),
     };
   }
 }
