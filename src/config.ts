@@ -25,6 +25,9 @@ const defaultConfig = {
 
   JWT_SECRET: '',
   JWT_EXPIRATION_DURATION: '7d',
+
+  LOGIN_RATE_LIMITER_MAX_ATTEMPTS: 3,
+  LOGIN_RATE_LIMITER_WINDOW_MS: 3 * 1000,
 };
 
 type IConfig = Optional<typeof defaultConfig>;
