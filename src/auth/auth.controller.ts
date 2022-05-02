@@ -20,19 +20,28 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<AccessTokenDto> {
+    // Check before we read from database to reduce database load
+    if (loginFailedRateLimiter.isReached(loginDto.username)) {
+      throw new ForbiddenException({ message: ErrorMessage.LOCKED_USER });
+    }
+
     const user = await this.userService.findOne(loginDto.username);
-    // Username not found
+
     if (!user) {
+      loginFailedRateLimiter.increase(loginDto.username);
+
+      // Lock not-found users temporarily to avoid reading from the database next time
+      if (loginFailedRateLimiter.isReached(loginDto.username)) {
+        throw new ForbiddenException({ message: ErrorMessage.LOCKED_USER });
+      }
+
       throw new UnauthorizedException({
         message: ErrorMessage.INVALID_CREDENTIALS,
       });
     }
 
-    // User is locked
     if (user.status === UserStatus.Locked) {
-      throw new ForbiddenException({
-        message: ErrorMessage.LOCKED_USER,
-      });
+      throw new ForbiddenException({ message: ErrorMessage.LOCKED_USER });
     }
 
     const matched = await this.userService.validate(user, loginDto.password);
@@ -40,18 +49,10 @@ export class AuthController {
       // Increase login failed attempts in rate limiter
       loginFailedRateLimiter.increase(user.username);
 
-      // If rate limit is reached:
-      // - Lock the user
-      // - Reset key in rate limiter to save memory
-      // - Notify that user has been locked
+      // If rate limit is reached, lock the user
       if (loginFailedRateLimiter.isReached(user.username)) {
         this.userService.lock(user.username);
-
-        loginFailedRateLimiter.reset(user.username);
-
-        throw new ForbiddenException({
-          message: ErrorMessage.LOCKED_USER,
-        });
+        throw new ForbiddenException({ message: ErrorMessage.LOCKED_USER });
       }
 
       throw new UnauthorizedException({
