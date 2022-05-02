@@ -1,8 +1,8 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as passwordUtils from '../utils/password';
-import { User } from './user.schema';
-import { UserService } from './user.service';
+import { User } from 'src/user/user.schema';
+import { UserService } from 'src/user/user.service';
+import * as passwordUtils from 'src/utils/password';
 
 export type MockModelType = {
   save: jest.Mock<any, any>;
