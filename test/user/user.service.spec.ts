@@ -56,4 +56,19 @@ describe('UserService', () => {
     });
     expect(mockModelInstance.save).toBeCalled();
   });
+
+  it("user's credentials should be validated", async () => {
+    jest
+      .spyOn(passwordUtils, 'checkPassword')
+      .mockReturnValueOnce(Promise.resolve(true));
+
+    const user = new User();
+
+    const validationResult = await userService.validate(
+      user,
+      mockPlainPassword,
+    );
+
+    expect(validationResult).toEqual(true);
+  });
 });
