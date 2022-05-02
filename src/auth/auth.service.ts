@@ -7,12 +7,12 @@ import { checkPassword } from '../utils/password';
 export class AuthService {
   constructor(private jwtService: JwtService) {}
 
-  async validateUser(user: User, plainPassword: string): Promise<boolean> {
+  validateUser(user: User, plainPassword: string): Promise<boolean> {
     return checkPassword(plainPassword, user.hashedPassword);
   }
 
   generateAccessToken(username: string): string {
-    const payload = { username: username };
+    const payload = { username };
     return this.jwtService.sign(payload);
   }
 }
