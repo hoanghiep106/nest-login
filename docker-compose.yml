@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  nest-login:
+    container_name: nest-login
+    restart: always
+    depends_on:
+      - mongodb
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    networks:
+      - login
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    volumes:
+      - ./mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - login
+volumes:
+  mongo-data:
+networks:
+  login:

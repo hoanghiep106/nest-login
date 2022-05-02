@@ -1,0 +1,12 @@
+node_modules
+.vscode
+.git*
+.dockerignore
+Dockerfile
+docker-compose*
+.prettier*
+.eslint*
+README.md
+test
+.DS_Store
+dist
