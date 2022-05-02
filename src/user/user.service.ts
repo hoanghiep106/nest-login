@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import config from '../config';
 import { UserStatus } from '../enums';
-import { hashPassword } from '../utils/password';
+import { checkPassword, hashPassword } from '../utils/password';
 import { CreateUserDto } from './user.dto';
 import { User, UserDocument } from './user.schema';
 
@@ -22,6 +22,10 @@ export class UserService {
       hashedPassword,
     });
     return user.save();
+  }
+
+  validate(user: User, plainPassword: string): Promise<boolean> {
+    return checkPassword(plainPassword, user.hashedPassword);
   }
 
   async findOne(username: string): Promise<User> {

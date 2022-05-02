@@ -29,10 +29,7 @@ export class AuthController {
       });
     }
 
-    const matched = await this.authService.validateUser(
-      user,
-      loginDto.password,
-    );
+    const matched = await this.userService.validate(user, loginDto.password);
     if (!matched) {
       // Increase login failed attempts in rate limiter
       loginFailedRateLimiter.increase(user.username);
