@@ -80,22 +80,22 @@ describe('AuthController', () => {
 
   it('user not found', async () => {
     jest.spyOn(userService, 'findOne').mockResolvedValue(Promise.resolve(null));
+    const mockRateLimiterIncrease = jest
+      .spyOn(loginFailedRateLimiter, 'increase')
+      .mockReturnValue(null);
+
     try {
       await authController.login(mockLoginDto);
     } catch (error) {
       expect(error).toBeInstanceOf(UnauthorizedException);
       expect(error.message).toEqual(ErrorMessage.INVALID_CREDENTIALS);
+      expect(mockRateLimiterIncrease).toBeCalledWith(mockLoginDto.username);
     }
   });
 
-  it('user is locked', async () => {
-    const lockedUser = {
-      ...mockUser,
-      status: UserStatus.Locked,
-    };
-    jest
-      .spyOn(userService, 'findOne')
-      .mockResolvedValue(Promise.resolve(lockedUser));
+  it('not-found username reaches rate limit', async () => {
+    jest.spyOn(loginFailedRateLimiter, 'isReached').mockReturnValue(true);
+
     try {
       await authController.login(mockLoginDto);
     } catch (error) {
@@ -104,7 +104,27 @@ describe('AuthController', () => {
     }
   });
 
+  it('user is locked', async () => {
+    const lockedUser = {
+      ...mockUser,
+      status: UserStatus.Locked,
+    };
+
+    jest.spyOn(loginFailedRateLimiter, 'isReached').mockReturnValue(false);
+    const spyFindOne = jest
+      .spyOn(userService, 'findOne')
+      .mockResolvedValue(Promise.resolve(lockedUser));
+    try {
+      await authController.login(mockLoginDto);
+    } catch (error) {
+      expect(spyFindOne).toBeCalledWith(mockLoginDto.username);
+      expect(error).toBeInstanceOf(ForbiddenException);
+      expect(error.message).toEqual(ErrorMessage.LOCKED_USER);
+    }
+  });
+
   it('wrong credentials', async () => {
+    jest.spyOn(loginFailedRateLimiter, 'isReached').mockReturnValue(false);
     jest
       .spyOn(userService, 'findOne')
       .mockResolvedValue(Promise.resolve(mockUser));
@@ -126,12 +146,13 @@ describe('AuthController', () => {
     jest
       .spyOn(userService, 'validate')
       .mockResolvedValue(Promise.resolve(false));
-    jest.spyOn(loginFailedRateLimiter, 'isReached').mockReturnValue(true);
-    const mockRateLimiterIncrease = jest.spyOn(
-      loginFailedRateLimiter,
-      'increase',
-    );
-    const mockRateLimiterReset = jest.spyOn(loginFailedRateLimiter, 'reset');
+    jest
+      .spyOn(loginFailedRateLimiter, 'isReached')
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
+    const mockRateLimiterIncrease = jest
+      .spyOn(loginFailedRateLimiter, 'increase')
+      .mockReturnValue(null);
 
     try {
       await authController.login(mockLoginDto);
@@ -139,7 +160,6 @@ describe('AuthController', () => {
       expect(userService.lock).toBeCalledWith(mockUser.username);
 
       expect(mockRateLimiterIncrease).toBeCalledWith(mockUser.username);
-      expect(mockRateLimiterReset).toBeCalledWith(mockUser.username);
 
       expect(error).toBeInstanceOf(ForbiddenException);
       expect(error.message).toEqual(ErrorMessage.LOCKED_USER);
