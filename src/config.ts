@@ -1,12 +1,12 @@
 /*
 USAGE:
+- All environment variables will be loaded from .env to config object
 - A variable can be accessed through Config if its default value is define here
 - A variable will be casted using its default value type
 
 IMPORTANT NOTES:
 - Secret values MUST NOT be stored in this file
 */
-/* eslint-disable max-len */
 import { Logger } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 
@@ -32,7 +32,7 @@ const defaultConfig = {
 
 type IConfig = Optional<typeof defaultConfig>;
 
-export class EnvConfig {
+export class Config {
   private mapping: IConfig = {};
 
   constructor() {
@@ -64,4 +64,4 @@ export class EnvConfig {
   }
 }
 
-export default new EnvConfig();
+export default new Config();
