@@ -3,16 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { User } from 'src/user/user.schema';
 import { UserService } from 'src/user/user.service';
 import * as passwordUtils from 'src/utils/password';
-
-export type MockModelType = {
-  save: jest.Mock<any, any>;
-};
-
-const mockModelInstance = {
-  save: jest.fn(),
-};
-
-export const mockModel = jest.fn(() => mockModelInstance);
+import { mockModel, mockModelInstance, MockModelType } from 'test/utils';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -36,11 +27,6 @@ describe('UserService', () => {
 
     userService = module.get<UserService>(UserService);
     mockUserModel = module.get(getModelToken(User.name));
-  });
-
-  it('should be defined', () => {
-    expect(userService).toBeDefined();
-    expect(mockUserModel).toBeDefined();
   });
 
   it('user should be saved with hashed password', async () => {
