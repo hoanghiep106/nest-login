@@ -18,7 +18,7 @@ A NestJS application with a login endpoint and rate limiter for failed attempts
 MONGO_URI=mongodb://mongodb/nest-login
 ```
 
-3. Spin up the container
+3. Spin up the container (listening on 3000)
 
 ```
 yarn docker:up
@@ -51,7 +51,7 @@ yarn
 3. Change the `MONGO_URI` env to connect to your local Mongo server
 
 ```
-MONGO_URI=mongodb://localhost:27017
+MONGO_URI=mongodb://localhost/nest-login
 ```
 
 4. Start the server locally (listening on 3000)
@@ -66,13 +66,15 @@ yarn start
 
 2. Import `NestLogin.postman_collection.json` in Postman. [Instruction can be found here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/)
 
-3. Create a test user using command
+3. Create a test user using
 
 ```
 yarn execute create-user 'YOUR_USER_NAME' 'YOUR_PASSWORD'
 ```
 
-4. Login using POST /login.
+4. Login using POST /login
+
+Request should look like:
 
 ```
 {
@@ -81,7 +83,7 @@ yarn execute create-user 'YOUR_USER_NAME' 'YOUR_PASSWORD'
 }
 ```
 
-Response should look like
+Response should look like:
 
 ```
 {
