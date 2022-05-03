@@ -11,7 +11,7 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - login
+      - nest-login-net
 
   mongodb:
     image: mongo
@@ -19,10 +19,14 @@ services:
     volumes:
       - ./mongo-data:/data/db
     ports:
-      - "27017:27017"
+      - "27018:27018"
     networks:
-      - login
+      - nest-login-net
+    environment:
+      MONGO_INITDB_DATABASE: nest-login
+
 volumes:
   mongo-data:
+
 networks:
-  login:
+  nest-login-net:
