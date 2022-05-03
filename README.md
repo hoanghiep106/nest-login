@@ -1,73 +1,132 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# NestJS Login
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS application with a login endpoint and rate limiter for failed attempts
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+### Docker setup (Recommended)
 
-## Description
+#### Prerequisite
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+1. [Docker](https://www.docker.com/products/docker-desktop)
 
-## Installation
+#### Instruction
 
-```bash
-$ npm install
+1. Create an .env file based on .env.example
+
+2. Change the `MONGO_URI` env to connect to Mongo service in Docker
+
+```
+MONGO_URI=mongodb://mongodb/nest-login
 ```
 
-## Running the app
+3. Spin up the container
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```
+yarn docker:up
 ```
 
-## Test
+4. Stop the container
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```
+yarn docker:down
 ```
 
-## Support
+### Manual setup
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+#### Prerequisite
 
-## Stay in touch
+1. [NodeJS v14](https://nodejs.org/en/download/)
+2. [Yarn](https://classic.yarnpkg.com/lang/en/docs/install)
+3. [MongoDB](https://www.mongodb.com/try/download/community)
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+#### Instruction
 
-## License
+1. Install dependencies:
 
-Nest is [MIT licensed](LICENSE).
+```
+yarn
+```
+
+2. Create an .env file based on .env.example
+
+3. Change the `MONGO_URI` env to connect to your local Mongo server
+
+```
+MONGO_URI=mongodb://localhost:27017
+```
+
+4. Start the server locally (listening on 3000)
+
+```
+yarn start
+```
+
+### Test the app
+
+1. Install API testing tool [Postman](https://www.postman.com/downloads/)
+
+2. Import `NestLogin.postman_collection.json` in Postman. [Instruction can be found here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/)
+
+3. Create a test user using command
+
+```
+yarn execute create-user 'YOUR_USER_NAME' 'YOUR_PASSWORD'
+```
+
+4. Login using POST /login.
+
+```
+{
+    "username": "YOUR_USER_NAME",
+    "password": "YOUR_PASSWORD"
+}
+```
+
+Response should look like
+
+```
+{
+    "accessToken": "...."
+}
+```
+
+### Unit tests
+
+1. Run the tests
+
+```
+yarn test
+```
+
+2. Export coverage report
+
+```
+yarn test:cov
+```
+
+### Integration tests
+
+#### Single command
+
+```
+yarn test-e2e
+```
+
+#### Step breakdown
+
+1. Spin up test environment
+
+```
+yarn test-e2e:up
+```
+
+2. Run the tests
+
+```
+yarn test-e2e:run
+```
+
+3. Shut down the test environment
+
+```
+yarn test-e2e:down
+```
