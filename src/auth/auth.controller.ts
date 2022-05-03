@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   ForbiddenException,
+  HttpCode,
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @HttpCode(200)
   async login(@Body() loginDto: LoginDto): Promise<AccessTokenDto> {
     // Check before we read from database to reduce database load
     if (loginFailedRateLimiter.isReached(loginDto.username)) {
@@ -51,7 +53,7 @@ export class AuthController {
 
       // If rate limit is reached, lock the user
       if (loginFailedRateLimiter.isReached(user.username)) {
-        this.userService.lock(user.username);
+        await this.userService.lock(user.username);
         throw new ForbiddenException({ message: ErrorMessage.LOCKED_USER });
       }
 

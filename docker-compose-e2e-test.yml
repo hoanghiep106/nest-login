@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  nest-login-test:
+    container_name: nest-login-test
+    restart: always
+    depends_on:
+      - mongodb-test
+    build:
+      context: .
+    ports:
+      - "3001:3001"
+    networks:
+      - login
+    environment:
+      NODE_ENV: e2e-test
+
+  mongodb-test:
+    image: mongo
+    container_name: mongodb-test
+    ports:
+      - "27019:27017"
+    networks:
+      - login
+    environment:
+      MONGO_INITDB_DATABASE: nest-login
+networks:
+  login:

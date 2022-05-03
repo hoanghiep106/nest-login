@@ -14,9 +14,11 @@ export type Optional<T> = {
   [K in keyof T]?: T[K];
 };
 
-dotenv.config();
+dotenv.config({
+  path: process.env.NODE_ENV === 'e2e-test' ? '.env.e2e-test' : '.env',
+});
 
-const defaultConfig = {
+export const defaultConfig = {
   PORT: 3000,
   MONGO_URI: '',
 
@@ -28,6 +30,11 @@ const defaultConfig = {
 
   LOGIN_RATE_LIMITER_MAX_ATTEMPTS: 3,
   LOGIN_RATE_LIMITER_WINDOW_MS: 3 * 1000,
+
+  BASE_API_URL: 'http://localhost:3000',
+
+  TEST_DATABASE_URL: 'mongodb://localhost:27018/',
+  TEST_DATABASE_NAME: 'test-login',
 };
 
 type IConfig = Optional<typeof defaultConfig>;
@@ -35,7 +42,7 @@ type IConfig = Optional<typeof defaultConfig>;
 export class Config {
   private mapping: IConfig = {};
 
-  constructor() {
+  constructor(defaultConfig) {
     // Parsing config from .env file.
     Object.entries(defaultConfig).forEach(([key, defaultValue]: any[]) => {
       let value = process.env[key] != null ? process.env[key] : defaultValue;
@@ -64,4 +71,4 @@ export class Config {
   }
 }
 
-export default new Config();
+export default new Config(defaultConfig);

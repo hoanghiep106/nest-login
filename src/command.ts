@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { UserStatus } from './enums';
 import { UserService } from './user/user.service';
 
 async function bootstrap() {
@@ -14,9 +15,11 @@ async function bootstrap() {
 
       const username = process.argv[3];
       const password = process.argv[4];
+      const status = process.argv[5];
 
       try {
         await userService.create({ username }, password);
+        if (status === UserStatus.Locked) await userService.lock(username);
       } catch (error) {
         Logger.error(error);
       }

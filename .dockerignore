@@ -8,5 +8,8 @@ docker-compose*
 .eslint*
 README.md
 test
+test-e2e
 .DS_Store
 dist
+mongo-data
+coverage

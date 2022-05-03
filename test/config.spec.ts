@@ -1,4 +1,4 @@
-import { Config } from 'src/config';
+import { Config, defaultConfig } from 'src/config';
 
 describe('envConfig', () => {
   const OLD_ENV = process.env;
@@ -14,7 +14,7 @@ describe('envConfig', () => {
 
   it('parse string config value', () => {
     process.env.JWT_SECRET = '123456';
-    const config = new Config();
+    const config = new Config(defaultConfig);
 
     const expectedStringValue = process.env.JWT_SECRET;
     expect(config.get('JWT_SECRET')).toEqual(expectedStringValue);
@@ -22,7 +22,7 @@ describe('envConfig', () => {
 
   it('parse number config value', () => {
     process.env.PORT = '3001';
-    const config = new Config();
+    const config = new Config(defaultConfig);
 
     const expectedNumberValue = parseInt(process.env.PORT);
     expect(config.get('PORT')).toEqual(expectedNumberValue);
